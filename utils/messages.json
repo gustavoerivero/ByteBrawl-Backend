@@ -1,0 +1,18 @@
+{
+  "Success": "Success",
+  "Void": "Error, not data",
+  "UnexpectedError": "Unexpected error",
+  "UCreated": "User created",
+  "UUpdated": "User updated",
+  "UDeleted": "User deleted",
+  "UNotFound": "Error, user not found",
+  "UFound": "Error, email has been used",
+  "ULogin": "Login success",
+  "ULoginError1": "Error, the user don't exits",
+  "ULoginError2": "Error, incorrect password",
+  "ULoginError3": "Error, the user is not authorized",
+  "ULoginError4": "Error, the user is not active",
+  "UChangePasswordError": "Error, incorrect password",
+  "UChangePasswordError1": "Error, the old password and new password are the same",
+  "UChangePasswordSuccess": "User password changed"
+}
