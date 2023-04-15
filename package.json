@@ -1,7 +1,7 @@
 {
-  "name": "minesweeper-backend",
+  "name": "bytebrawl-backend",
   "version": "1.0.0",
-  "description": "Backend of the minesweeper",
+  "description": "Backend of the ByteBrawl",
   "main": "app.js",
   "scripts": {
     "start": "nodemon app.js",
