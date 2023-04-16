@@ -2,7 +2,10 @@
 const express = require('express')
 const cors = require('cors')
 const morgan = require('morgan')
+const http = require('http')
+
 const swaggerDocs = require('./services/swagger')
+const chat = require('./chat/chat')
 const routes = require('./routes')
 
 require('dotenv').config()
@@ -35,6 +38,11 @@ app.get(url, (_, res) =>
   res.send(`Connected on ByteBrawl API ${process.env.VERSION} version!`)
 )
 
-app.listen(port, () => 
+// Start chat
+const server = http.createServer(app)
+chat(server)
+
+// Listening server
+server.listen(port, () => 
   console.log(`Server is running on ${process.env.URL}`)
 )

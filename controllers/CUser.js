@@ -49,8 +49,12 @@ const createUser = async (req, res) => {
         password: bcrypt.hashSync(value.password),
       })
 
-      const saveUser = await user.save()
-      resp.makeResponsesOkData(res, saveUser, 'UCreated')
+      await user.save()
+      resp.makeResponsesOkData(res, {
+        fullName: value.fullName,
+        username: value.username,
+        email: value.email
+      }, 'UCreated')
 
     }
 
@@ -107,12 +111,9 @@ const getAllUsers = async (req, res) => {
     const users = await mUser.paginate({
       status: 'A'
     }, {
-      page: req.params.page,
-      limit: req.params.limit,
-      sort: { createdAt: -1 },
-      populate: {
-        path: 'role',
-      }
+      page: req.params.page || 1,
+      limit: req.params.limit || 10,
+      sort: { createdAt: -1 }
     })
 
     resp.makeResponsesOkData(res, users, 'Success')
