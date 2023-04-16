@@ -14,5 +14,6 @@
   "ULoginError4": "Error, the user is not active",
   "UChangePasswordError": "Error, incorrect password",
   "UChangePasswordError1": "Error, the old password and new password are the same",
-  "UChangePasswordSuccess": "User password changed"
+  "UChangePasswordSuccess": "User password changed",
+  "MCreated": "Message created"
 }

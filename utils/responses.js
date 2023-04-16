@@ -20,7 +20,7 @@ function makeResponsesException(res, err) {
 function makeResponsesOk(res, code) {
   const msg = {
     OK: 1,
-    Message: message[[code]]
+    Message: message[[code]] || 'Success'
   }
   res.status(200).json(msg)
 }
@@ -29,7 +29,7 @@ function makeResponsesOkData(res, data, code) {
   const msg = {
     OK: 1,
     Data: data,
-    Message: message[[code]]
+    Message: message[[code]] || 'Success'
   }
   res.status(200).json(msg)
 }

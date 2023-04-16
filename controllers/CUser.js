@@ -1,7 +1,6 @@
 // Imports
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const generator = require('generate-password')
 
 const mUser = require('../models/MUser')
 const resp = require('../utils/responses')
