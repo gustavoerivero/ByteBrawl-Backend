@@ -15,7 +15,7 @@ require('./db/db')
 const swaggerUi = require('swagger-ui-express')
 
 // Settings
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 8000
 const app = express()
 
 // Middlewares
@@ -44,5 +44,5 @@ chat(server)
 
 // Listening server
 server.listen(port, () => 
-  console.log(`Server is running on ${process.env.URL}`)
+  console.log(`Server is running on the port ${port}`)
 )

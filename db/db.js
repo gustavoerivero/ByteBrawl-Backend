@@ -9,8 +9,8 @@ const connection = `mongodb+srv://${user}:${pass}@${uri}`
 
 mongoose
   .connect(connection)
-  .then(res => {
-    console.log(`Database connected in ${uri}`)
+  .then(() => {
+    console.log(`Database connected.`)
   })
   .catch(err => {
     console.error(err)

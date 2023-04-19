@@ -71,7 +71,7 @@ const login = async (req, res) => {
   try {
 
     const valUser = await mUser.findOne({
-      email: req.body.email
+      username: req.body.username
     })
 
     if (!valUser) {
