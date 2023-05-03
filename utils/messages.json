@@ -3,6 +3,7 @@
   "Void": "Error, not data",
   "UnexpectedError": "Unexpected error",
   "UCreated": "User created",
+  "UReactivated": "User reactivated",
   "UUpdated": "User updated",
   "UDeleted": "User deleted",
   "UNotFound": "Error, user not found",
@@ -15,5 +16,7 @@
   "UChangePasswordError": "Error, incorrect password",
   "UChangePasswordError1": "Error, the old password and new password are the same",
   "UChangePasswordSuccess": "User password changed",
-  "MCreated": "Message created"
+  "MCreated": "Message created",
+  "Unauthorized": "Unauthorized user",
+  "Forbidden": "Request rejected. Forbidden"
 }

@@ -1,5 +1,14 @@
 const message = require('./messages.json')
 
+function makeResponse400(res, error, code = 'Unauthorized', number = 404) {
+  const msg = {
+    OK: 0,
+    Error: error,
+    Message: message[[code || 'Unauthorized']]
+  }
+  res.status(number).json(msg)
+}
+
 function makeResponsesError(res, error, code) {
   const msg = {
     OK: 0,
@@ -38,5 +47,6 @@ module.exports = {
   makeResponsesException,
   makeResponsesOkData,
   makeResponsesError,
-  makeResponsesOk
+  makeResponsesOk,
+  makeResponse400
 }
