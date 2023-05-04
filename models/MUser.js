@@ -3,6 +3,15 @@ const Schema = mongoose.Schema
 const mongoosePaginate = require('mongoose-paginate-v2')
 
 const userSchema = Schema({
+  isAvatarImageSet: {
+    type: Boolean,
+    default: false,
+  },
+  avatarImage: {
+    type: String,
+    default: '',
+    maxlength: [10254, 'Avatar Image must be less than 255 characters'],
+  },
   fullName: {
     type: String,
     required: [true, 'Full name is required'],

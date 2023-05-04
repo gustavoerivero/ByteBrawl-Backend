@@ -5,9 +5,9 @@ const mongoosePaginate = require('mongoose-paginate-v2')
 const messageSchema = Schema({
   text: {
     type: String,
-    required: [true, 'Message is required'],
-    minlength: [1, 'Message must be at least 1 character'],
-    maxlength: [10240, 'Message must be less than 10240 characters'],
+    required: [true, 'Text is required'],
+    minlength: [1, 'Text must be at least 1 character'],
+    maxlength: [10240, 'Text must be less than 10240 characters'],
   },
   users: {
     type: Array,

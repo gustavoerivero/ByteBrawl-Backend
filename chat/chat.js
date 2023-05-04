@@ -1,7 +1,10 @@
-const socketIO = require('socket.io')
-
 module.exports = (server) => {
-  const io = socketIO(server)
+  const io = require('socket.io')(server, {
+    cors: {
+      origin: 'http://localhost:3000',
+      methods: ['GET', 'POST']
+    }
+  })
 
   // Store all online users inside this map
   global.onlineUsers = new Map()

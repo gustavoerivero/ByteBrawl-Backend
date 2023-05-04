@@ -13,7 +13,7 @@ const createMessage = async (req, res) => {
     const { from, to, text } = req.body
 
     const message = new mMessage({
-      text: text,
+      text,
       users: [
         from,
         to

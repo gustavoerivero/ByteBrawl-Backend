@@ -9,7 +9,7 @@
   "UNotFound": "Error, user not found",
   "UFound": "Error, email has been used",
   "ULogin": "Login success",
-  "ULoginError1": "Error, the user don't exits",
+  "ULoginError1": "Error, the user don't exist",
   "ULoginError2": "Error, incorrect password",
   "ULoginError3": "Error, the user is not authorized",
   "ULoginError4": "Error, the user is not active",

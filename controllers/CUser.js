@@ -32,6 +32,7 @@ const createUser = async (req, res) => {
       })
 
       resp.makeResponsesOkData(res, { fullName, username, email }, 'UReactivated')
+      return
     }
 
     const user = new mUser({
@@ -107,7 +108,7 @@ const getAllUsers = async (req, res) => {
       page: page || 1,
       limit: limit || 10,
       sort: { createdAt: -1 },
-      select: '_id fullName username email status'
+      select: '_id avatarImage isAvatarImageSet fullName username email status'
     })
 
     resp.makeResponsesOkData(res, users, 'Success')
@@ -134,8 +135,7 @@ const getUser = async (req, res) => {
       _id: id,
       status: 'A'
     })
-      .sort({ createdAt: -1 })
-      .select('-_id fullName username email status ')
+      .select('-_id avatarImage isAvatarImageSet fullName username email status ')
 
     resp.makeResponsesOkData(res, user, 'Success')
   } catch (error) {
@@ -159,7 +159,7 @@ const getProfile = async (req, res) => {
       _id: auth.id,
       status: 'A'
     })
-      .select('-_id fullName username email status')
+      .select('-_id avatarImage isAvatarImageSet fullName username email status')
 
     resp.makeResponsesOkData(res, user, 'Success')
   } catch (error) {
@@ -192,6 +192,36 @@ const updateUser = async (req, res) => {
     })
 
     resp.makeResponsesOkData(res, saveUser, 'Success')
+
+  } catch (error) {
+    resp.makeResponsesError(res, error, 'UnexpectedError')
+  }
+}
+
+const updateAvatar = async (req, res) => {
+  try {
+    const auth = await authenticateToken(req, res)
+    if (!auth) return resp.makeResponse400(res, 'Unauthorized user.', 'Unauthorized', 401)
+
+    const { avatar } = req.body
+
+    await mUser.findOneAndUpdate({
+      _id: auth.id,
+      status: 'A'
+    }, {
+      $set: {
+        avatarImage: avatar,
+        isAvatarImageSet: true
+      }
+    })
+
+    const user = await mUser.findOne({
+      _id: auth.id,
+      status: 'A'
+    })
+      .select('-_id avatarImage isAvatarImageSet username status')
+
+    resp.makeResponsesOkData(res, user, 'Success')
 
   } catch (error) {
     resp.makeResponsesError(res, error, 'UnexpectedError')
@@ -293,5 +323,6 @@ module.exports = {
   getUser,
   getProfile,
   updateUser,
+  updateAvatar,
   deleteUser
 }
