@@ -4,9 +4,9 @@ module.exports = (server) => {
   const io = new Server(server, {
     cors: {
       origin: [ 
-        'https://chatbrawl.vercel.app/', 
-        'https://chatbrawl-git-main-gustavoerivero.vercel.app/',
-        'https://chatbrawl-72ogq0nrz-gustavoerivero.vercel.app/'
+        'https://chatbrawl.vercel.app', 
+        'https://chatbrawl-git-main-gustavoerivero.vercel.app',
+        'https://chatbrawl-72ogq0nrz-gustavoerivero.vercel.app'
       ],
       methods: ['GET', 'POST'],
       credentials: true
