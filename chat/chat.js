@@ -5,7 +5,7 @@ module.exports = (server) => {
     cors: {
       origin: '*',
       methods: ['GET', 'POST'],
-      allowedHeaders: ['Access-Control-Allow-Origin']
+      allowedHeaders: ['Access-Control-Allow-Origin'],
     }
   })
 
