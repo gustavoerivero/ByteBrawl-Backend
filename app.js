@@ -8,7 +8,7 @@ const swaggerDocs = require('./services/swagger')
 const chat = require('./chat/chat')
 const routes = require('./routes')
 
-const { Server } = require('socket.io')
+const corsMiddleware = require('./utils/cors')
 
 require('dotenv').config()
 require('./db/db')
@@ -27,6 +27,7 @@ app.use(morgan('tiny'))
 app.use(express.urlencoded({ extended: false }))
 
 app.use(cors())
+app.use(corsMiddleware(app))
 
 app.use(`${process.env.API_DOC}`, swaggerUi.serve, swaggerUi.setup(swaggerDocs))
 
