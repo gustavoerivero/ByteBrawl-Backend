@@ -6,7 +6,6 @@ module.exports = (server) => {
       origin: '*',
       methods: ['GET', 'POST'],
       allowedHeaders: ['Access-Control-Allow-Origin', 'Content-Type', 'Authorization'],
-      credentials: true
     }
   })
 
