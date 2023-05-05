@@ -27,6 +27,12 @@ module.exports = (server) => {
       }
     })
 
+    socket.on('check-connection', data => {
+      const userOnline = onlineUsers.get(data.to)
+      console.log('Is user online?', userOnline)
+      io.to(userOnline).emit('checked', { userOnline, id: data.to })
+    })
+
     socket.on('send-msg', data => {
       const sendUserSocket = onlineUsers.get(data.to)
       if (sendUserSocket) {
