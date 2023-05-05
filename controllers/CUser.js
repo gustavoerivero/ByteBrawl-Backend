@@ -103,7 +103,8 @@ const getAllUsers = async (req, res) => {
     const { page, limit } = req.params
 
     const users = await mUser.paginate({
-      status: 'A'
+      status: 'A',
+      _id: { $ne: auth.id }
     }, {
       page: page || 1,
       limit: limit || 10,

@@ -13,6 +13,7 @@ require('./db/db')
 
 // Swagger
 const swaggerUi = require('swagger-ui-express')
+const authenticateToken = require('./middlewares/authenticateToken')
 
 // Settings
 const port = process.env.PORT || 8000
@@ -38,11 +39,26 @@ app.get(url, (_, res) =>
   res.send(`Connected on ByteBrawl API ${process.env.VERSION} version!`)
 )
 
+app.get(`${url}/auth`, (req, res) => {
+  try {
+    const auth = Boolean(authenticateToken(req, res))
+    if (!auth?.id) {
+      res.send({ Authenticated: false })
+      return
+    }
+
+    res.send({ Authenticated: true  })
+
+  } catch (error) {
+    res.send({ Authenticated: false, error: error })
+  }
+})
+
 // Start chat
 const server = http.createServer(app)
 chat(server)
 
 // Listening server
-server.listen(port, () => 
+server.listen(port, () =>
   console.log(`Server is running on the port ${port}`)
 )

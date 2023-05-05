@@ -1,4 +1,5 @@
 // Imports
+const authenticateToken = require('../middlewares/authenticateToken')
 const mMessage = require('../models/MMessage')
 const resp = require('../utils/responses')
 
@@ -9,16 +10,19 @@ const resp = require('../utils/responses')
  */
 const createMessage = async (req, res) => {
   try {
+
+    const auth = await authenticateToken(req, res)
+    if (!auth) return resp.makeResponse400(res, 'Unauthorized user.', 'Unauthorized', 401)
     
-    const { from, to, text } = req.body
+    const { to, text } = req.body
 
     const message = new mMessage({
       text,
       users: [
-        from,
+        auth.id,
         to
       ],
-      sender: from
+      sender: auth.id
     })
 
     const response = await message.save()
@@ -37,11 +41,15 @@ const createMessage = async (req, res) => {
  */
 const getAllMessages = async (req, res) => {
   try {
-    const { from, to } = req.body
+
+    const auth = await authenticateToken(req, res)
+    if (!auth) return resp.makeResponse400(res, 'Unauthorized user.', 'Unauthorized', 401)
+
+    const { to } = req.body
 
     const messages = await mMessage.find({
       users: {
-        $all: [from, to]
+        $all: [auth.id, to]
       },
     }).sort({
       updatedAt: 1
@@ -49,8 +57,9 @@ const getAllMessages = async (req, res) => {
 
     const protectMessages = messages.map(msg => {
       return {
-        fromSelf: msg?.sender?.toString() === from,
-        message: msg?.text
+        fromSelf: msg?.sender?.toString() === auth.id,
+        message: msg?.text,
+        time: msg?.updatedAt
       }
     })
 
