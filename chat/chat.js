@@ -1,27 +1,41 @@
 module.exports = (server) => {
-  const io = require('socket.io')(server, {
+  const { Server } = require('socket.io')
+
+  const io = new Server(server, {
     cors: {
       origin: 'http://localhost:3000',
-      methods: ['GET', 'POST']
+      methods: ['GET', 'POST'],
+      credentials: true
     }
   })
 
   // Store all online users inside this map
-  global.onlineUsers = new Map()
+  const onlineUsers = new Map()
 
   io.on('connection', socket => {
+
     console.log('User connected')
 
-    global.chatSocket = socket
-
     socket.on('add-user', userID => {
-      onlineUsers.set(userID, socket.id)
+      if (!onlineUsers.has(userID)) {
+        onlineUsers.set(userID, socket.id)
+        socket.userID = userID
+      }
     })
 
     socket.on('send-msg', data => {
       const sendUserSocket = onlineUsers.get(data.to)
       if (sendUserSocket) {
-        socket.to(sendUserSocket).emit('msg-received', data.text)
+        io.to(sendUserSocket).emit('msg-received', data.message)
+      } else {
+        socket.emit('msg-error', { error: `User ${data.to} is not online.` })
+      }
+    })
+
+    socket.on('disconnect', () => {
+      if (socket.userID) {
+        onlineUsers.delete(socket.userID)
+        console.log(`User ${socket.userID} disconnected`)
       }
     })
 

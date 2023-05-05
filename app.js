@@ -8,6 +8,8 @@ const swaggerDocs = require('./services/swagger')
 const chat = require('./chat/chat')
 const routes = require('./routes')
 
+const { Server } = require('socket.io')
+
 require('dotenv').config()
 require('./db/db')
 
