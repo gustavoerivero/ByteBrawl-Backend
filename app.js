@@ -2,10 +2,8 @@
 const express = require('express')
 const cors = require('cors')
 const morgan = require('morgan')
-const http = require('http')
 
 const swaggerDocs = require('./services/swagger')
-const chat = require('./chat/chat')
 const routes = require('./routes')
 
 require('dotenv').config()
@@ -57,17 +55,3 @@ app.get(`${url}/auth`, (req, res) => {
 
 // Listening server
 app.listen(port, () => console.log(`API is running on the port ${port}`))
-
-// Socket server
-const socketPort = process.env.SOCKET_PORT || 8080
-
-// Init socket server
-const server = http.createServer()
-
-// Start chat server
-const io = chat(server)
-
-// Listening server
-server.listen(socketPort, () =>
-  console.log(`Server is running on the port ${socketPort}`)
-)
