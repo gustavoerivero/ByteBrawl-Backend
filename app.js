@@ -39,6 +39,7 @@ app.get(url, (_, res) =>
   res.send(`Connected on ByteBrawl API ${process.env.VERSION} version!`)
 )
 
+// Check user authorized
 app.get(`${url}/auth`, (req, res) => {
   try {
     const auth = Boolean(authenticateToken(req, res))
@@ -54,11 +55,19 @@ app.get(`${url}/auth`, (req, res) => {
   }
 })
 
-// Start chat
-const server = http.createServer(app)
-chat(server)
+// Listening server
+app.listen(port, () => console.log(`API is running on the port ${port}`))
+
+// Socket server
+const socketPort = process.env.SOCKET_PORT || 8080
+
+// Init socket server
+const server = http.createServer()
+
+// Start chat server
+const io = chat(server)
 
 // Listening server
-server.listen(port, () =>
-  console.log(`Server is running on the port ${port}`)
+server.listen(socketPort, () =>
+  console.log(`Server is running on the port ${socketPort}`)
 )

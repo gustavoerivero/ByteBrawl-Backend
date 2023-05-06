@@ -5,7 +5,8 @@ module.exports = (server) => {
     cors: {
       origin: '*',
       methods: ['GET', 'POST']
-    }
+    },
+    pingTimeout: 30000
   })
 
   // Store all online users inside this map
