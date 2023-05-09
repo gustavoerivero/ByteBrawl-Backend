@@ -100,11 +100,17 @@ const getAllUsers = async (req, res) => {
     const auth = await authenticateToken(req, res)
     if (!auth) return resp.makeResponse400(res, 'Unauthorized user.', 'Unauthorized', 401)
 
-    const { page, limit } = req.params
+    const { search, page, limit } = req.query
+
+    const searchQuery = {}
+    if (search && search.trim() !== '') {
+      searchQuery.username = { $regex: search.trim(), $options: 'i' }
+    }
 
     const users = await mUser.paginate({
       status: 'A',
-      _id: { $ne: auth.id }
+      _id: { $ne: auth.id },
+      ...searchQuery
     }, {
       page: page || 1,
       limit: limit || 10,
