@@ -17,6 +17,7 @@ require('dotenv').config()
  */
 const createUser = async (req, res) => {
   try {
+    
     const { fullName, username, email, password } = req.body
 
     const existingUser = await mUser.findOne({ email })
@@ -45,7 +46,7 @@ const createUser = async (req, res) => {
     await user.save()
 
     resp.makeResponsesOkData(res, { fullName, username, email }, 'UCreated')
-    
+
   } catch (error) {
     resp.makeResponsesError(res, error, 'UnexpectedError')
   }
