@@ -45,6 +45,7 @@ const createUser = async (req, res) => {
     await user.save()
 
     resp.makeResponsesOkData(res, { fullName, username, email }, 'UCreated')
+    
   } catch (error) {
     resp.makeResponsesError(res, error, 'UnexpectedError')
   }

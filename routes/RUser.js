@@ -3,7 +3,7 @@ const cUser = require('../controllers/CUser')
 
 router.post('/create', cUser.createUser)
 router.post('/login', cUser.login)
-router.post('/password', cUser.changePassword)
+router.post('/restore', cUser.changePassword)
 router.get('/profile', cUser.getProfile)
 router.get('/', cUser.getAllUsers)
 router.get('/:id', cUser.getUser)
