@@ -32,6 +32,10 @@ const userSchema = Schema({
     maxlength: [255, 'Email must be less than 255 characters'],
     unique: [true, 'Email must be unique'],
   },
+  verified: {
+    type: Boolean,
+    default: false
+  },
   password: {
     type: String,
     required: [true, 'Password is required'],

@@ -6,6 +6,9 @@ const mUser = require('../models/MUser')
 const resp = require('../utils/responses')
 const validate = require('../utils/validate')
 const authenticateToken = require('../middlewares/authenticateToken')
+const generator = require('../utils/password-generator')
+const sendEmail = require('../services/mailer')
+const template = require('../services/assets/passwordResetTemplate')
 
 require('dotenv').config()
 
@@ -17,7 +20,7 @@ require('dotenv').config()
  */
 const createUser = async (req, res) => {
   try {
-    
+
     const { fullName, username, email, password } = req.body
 
     const existingUser = await mUser.findOne({ email })
@@ -237,6 +240,40 @@ const updateAvatar = async (req, res) => {
   }
 }
 
+const restorePassword = async (req, res) => {
+  try {
+    const { email } = req.body
+
+    const user = await mUser.findOne({ email, status: 'A' })
+
+    if (!user) {
+      return resp.makeResponsesError(res, `User don't exist.`, 'UNotFound')
+    }
+
+    const password = generator(12)
+
+    const updateUser = await mUser.findOneAndUpdate({
+      email,
+      status: 'A'
+    }, {
+      $set: {
+        password: bcrypt.hashSync(password)
+      }
+    })
+
+    const supportEmail = process.env.EMAIL_USER.toString()
+
+    const sendedEmail = await sendEmail(email, 'Recover your account!', template(password, supportEmail))
+
+    console.log(sendedEmail && 'Email sended')
+
+    resp.makeResponsesOkData(res, updateUser, 'UChangePasswordSuccess')
+
+  } catch (error) {
+    resp.makeResponsesError(res, error, 'UnexpectedError')
+  }
+}
+
 /**
  * Changes the password of a user.
  *
@@ -333,5 +370,6 @@ module.exports = {
   getProfile,
   updateUser,
   updateAvatar,
-  deleteUser
+  deleteUser,
+  restorePassword
 }
