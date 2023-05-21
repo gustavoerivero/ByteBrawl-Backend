@@ -3,12 +3,16 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 
 const mUser = require('../models/MUser')
+const mOTP = require('../models/MOTP')
+
 const resp = require('../utils/responses')
 const validate = require('../utils/validate')
 const authenticateToken = require('../middlewares/authenticateToken')
 const generator = require('../utils/password-generator')
 const sendEmail = require('../services/mailer')
 const template = require('../services/assets/passwordResetTemplate')
+const generateOTP = require('../utils/generateOTP')
+const OTPTemplate = require('../services/assets/OTPTemplate')
 
 require('dotenv').config()
 
@@ -48,6 +52,39 @@ const createUser = async (req, res) => {
 
     await user.save()
 
+    if (!email) {
+      return resp.makeResponsesError(
+        res,
+        'Provide values for email.',
+        'UnexpectedError'
+      )
+    }
+
+    const generatedOTP = await generateOTP()
+
+    const otp = new mOTP({
+      email,
+      otp: bcrypt.hashSync(generatedOTP),
+      createdAt: Date.now(),
+      expiresAt: Date.now() + 3600000 + 24
+    })
+
+    await mOTP.deleteOne({ email })
+    await otp.save()
+
+    const sendedEmail = await sendEmail(
+      email,
+      `Email verification. - BItE brAwL`,
+      OTPTemplate(
+        generatedOTP,
+        24,
+        process.env.EMAIL_USER.toString(),
+        'Verify your email with the code below'
+      )
+    )
+
+    console.log(sendedEmail && 'Email sended')
+
     resp.makeResponsesOkData(res, { fullName, username, email }, 'UCreated')
 
   } catch (error) {
@@ -76,6 +113,10 @@ const login = async (req, res) => {
 
     if (!valPass) {
       return resp.makeResponsesError(res, 'Incorrect credentials', 'ULoginError2')
+    }
+
+    if (!valUser.verified) {
+      return resp.makeResponsesError(res, 'User is not verified', 'UnexpectedError')
     }
 
     const secret = process.env.SECRET_KEY

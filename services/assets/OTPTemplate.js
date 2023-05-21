@@ -1,4 +1,21 @@
-const template = (OTP, duration, supportMail) => {
+require('dotenv').config()
+
+/**
+ * Method that generates an HTML template with CSS styles 
+ * or mailing. This template receives parameters to adjust 
+ * the mail sent according to these parameters.
+ * @param {String} OTP Unencrypted OTP code to be sent by mail.
+ * @param {Number} duration Duration of validity of the OTP code.
+ * @param {String} supportMail Customer service and support mail.
+ * @param {String} subject Title to be held by the template.
+ * @returns {String} Customized template for mailing the OTP code.
+ */
+const template = (
+  OTP = '1234',
+  duration = 1,
+  supportMail = process.env.EMAIL_USER.toString(),
+  subject = 'The OTP code you have requested'
+) => {
   return `
   <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
   <html xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office" style="font-family:arial, 'helvetica neue', helvetica, sans-serif"> 
@@ -97,7 +114,7 @@ const template = (OTP, duration, supportMail) => {
                     <td class="es-m-p0r es-m-p20b" valign="top" align="center" style="padding:0;Margin:0;width:560px"> 
                      <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px"> 
                        <tr> 
-                        <td align="center" style="padding:0;Margin:0"><h1 style="Margin:0;line-height:31px;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;font-size:26px;font-style:normal;font-weight:bold;color:#488b80">&nbsp;The OTP code you have requested</h1></td> 
+                        <td align="center" style="padding:0;Margin:0"><h1 style="Margin:0;line-height:31px;mso-line-height-rule:exactly;font-family:'lucida sans unicode', 'lucida grande', sans-serif;font-size:26px;font-style:normal;font-weight:bold;color:#488b80">&nbsp;${subject ? subject : 'The OTP code you have requested'}</h1></td> 
                        </tr> 
                        <tr> 
                         <td align="center" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:30px;color:#333333;font-size:20px"><strong>${OTP}</strong></p></td> 

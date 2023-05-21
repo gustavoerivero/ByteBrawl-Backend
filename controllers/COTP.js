@@ -2,6 +2,8 @@
 const bcrypt = require('bcryptjs')
 
 const mOTP = require('../models/MOTP')
+const mUser = require('../models/MUser')
+
 const generateOTP = require('../utils/generateOTP')
 const resp = require('../utils/responses')
 const sendEmail = require('../services/mailer')
@@ -27,6 +29,15 @@ const createOTP = async (req, res) => {
 
     const generatedOTP = await generateOTP()
 
+    const otp = new mOTP({
+      email,
+      otp: bcrypt.hashSync(generatedOTP),
+      createdAt: Date.now(),
+      expiresAt: Date.now() + 3600000 * duration
+    })
+
+    const response = await otp.save()
+
     const sendedEmail = await sendEmail(
       email,
       `Hey! Here is the OTP Code. - BItE brAwL`,
@@ -38,15 +49,6 @@ const createOTP = async (req, res) => {
     )
 
     console.log(sendedEmail && 'Email sended')
-
-    const otp = new mOTP({
-      email,
-      otp: bcrypt.hashSync(generatedOTP),
-      createdAt: Date.now(),
-      expiresAt: Date.now() + 3600000 * duration
-    })
-
-    const response = await otp.save()
 
     resp.makeResponsesOkData(res, response, 'Success')
 
@@ -91,7 +93,7 @@ const verifyOTP = async (req, res) => {
       )
       return
     }
- 
+
     const hashedOTP = matchedOTPRecord.otp
     const validOTP = await verifyHash(otp, hashedOTP)
 
@@ -102,7 +104,135 @@ const verifyOTP = async (req, res) => {
   }
 }
 
+const sendEmailVerification = async (req, res) => {
+  try {
+    const { email } = req.body
+
+    if (!email) {
+      resp.makeResponsesError(
+        res,
+        'Provide values for email.',
+        'UnexpectedError'
+      )
+      return
+    }
+
+    const user = await mUser.findOne({ email })
+
+    if (!user) {
+      resp.makeResponsesError(
+        res,
+        `There's no account for the provided email.`,
+        'UnexpectedError'
+      )
+      return
+    }
+
+    const generatedOTP = await generateOTP()
+
+    const otp = new mOTP({
+      email,
+      otp: bcrypt.hashSync(generatedOTP),
+      createdAt: Date.now(),
+      expiresAt: Date.now() + 3600000 + 24
+    })
+
+    await mOTP.deleteOne({ email })
+    const response = await otp.save()
+
+    const sendedEmail = await sendEmail(
+      email,
+      `Email verification. - BItE brAwL`,
+      OTPTemplate(
+        generatedOTP,
+        24,
+        process.env.EMAIL_USER.toString(),
+        'Verify your email with the code below'
+      )
+    )
+
+    console.log(sendedEmail && 'Email sended')
+
+    resp.makeResponsesOkData(res, response, 'Success')
+
+  } catch (error) {
+    resp.makeResponsesError(res, error, 'UnexpectedError')
+  }
+}
+
+const verificationEmail = async (req, res) => {
+  try {
+
+    const { email, otp } = req.body
+
+    if (!(email && otp)) {
+      resp.makeResponsesError(
+        res,
+        'Empty otp details are not allowed.',
+        'UnexpectedError'
+      )
+      return
+    }
+
+    const matchedOTPRecord = await mOTP.findOne({ email })
+
+    if (!matchedOTPRecord) {
+      resp.makeResponsesError(
+        res,
+        'No OTP records found.',
+        'UnexpectedError'
+      )
+      return
+    }
+
+    const { expiresAt } = matchedOTPRecord
+
+    if (expiresAt < Date.now()) {
+      await mOTP.deleteOne({ email })
+      resp.makeResponsesError(
+        res,
+        'Code has expired. Request for a new one.',
+        'UnexpectedError'
+      )
+      return
+    }
+
+    const hashedOTP = matchedOTPRecord.otp
+    const validOTP = await verifyHash(otp, hashedOTP)
+
+    if (!validOTP) {
+      resp.makeResponsesError(
+        res,
+        'Invalid code passed. Check your inbox.',
+        'UnexpectedError'
+      )
+      return
+    }
+
+    await mOTP.deleteOne({ email })
+
+    const response = await mUser.findOneAndUpdate({
+      email
+    }, {
+      $set: {
+        verified: true
+      }
+    })
+
+    resp.makeResponsesOkData(
+      res,
+      response,
+      'Success'
+    )
+
+  } catch (error) {
+    resp.makeResponsesError(res, error, 'UnexpectedError')
+  }
+}
+
 module.exports = {
   createOTP,
-  verifyOTP
+  verifyOTP,
+  sendEmailVerification,
+  verificationEmail
 }
