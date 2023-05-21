@@ -18,11 +18,10 @@ const createOTP = async (req, res) => {
     const { email, duration } = req.body
 
     if (!email) {
-      resp.makeResponsesError(res,
+      return resp.makeResponsesError(res,
         'Provide values for email.',
         'UnexpectedError'
       )
-      return
     }
 
     await mOTP.deleteOne({ email })
@@ -63,35 +62,32 @@ const verifyOTP = async (req, res) => {
     const { email, otp } = req.body
 
     if (!(email && otp)) {
-      resp.makeResponsesError(
+      return resp.makeResponsesError(
         res,
         'Provide values for email and OTP.',
         'UnexpectedError'
       )
-      return
     }
 
     const matchedOTPRecord = await mOTP.findOne({ email })
 
     if (!matchedOTPRecord) {
-      resp.makeResponsesError(
+      return resp.makeResponsesError(
         res,
         'No OTP records found.',
         'UnexpectedError'
       )
-      return
     }
 
     const { expiresAt } = matchedOTPRecord
 
     if (expiresAt < Date.now()) {
       await mOTP.deleteOne({ email })
-      resp.makeResponsesError(
+      return resp.makeResponsesError(
         res,
         'Code has expired. Request for a new one.',
         'UnexpectedError'
       )
-      return
     }
 
     const hashedOTP = matchedOTPRecord.otp
@@ -109,23 +105,21 @@ const sendEmailVerification = async (req, res) => {
     const { email } = req.body
 
     if (!email) {
-      resp.makeResponsesError(
+      return resp.makeResponsesError(
         res,
         'Provide values for email.',
         'UnexpectedError'
       )
-      return
     }
 
     const user = await mUser.findOne({ email })
 
     if (!user) {
-      resp.makeResponsesError(
+      return resp.makeResponsesError(
         res,
         `There's no account for the provided email.`,
         'UnexpectedError'
       )
-      return
     }
 
     const generatedOTP = await generateOTP()
@@ -134,7 +128,7 @@ const sendEmailVerification = async (req, res) => {
       email,
       otp: bcrypt.hashSync(generatedOTP),
       createdAt: Date.now(),
-      expiresAt: Date.now() + 3600000 + 24
+      expiresAt: Date.now() + 3600000 * 24
     })
 
     await mOTP.deleteOne({ email })
@@ -177,36 +171,33 @@ const verificationEmail = async (req, res) => {
     const matchedOTPRecord = await mOTP.findOne({ email })
 
     if (!matchedOTPRecord) {
-      resp.makeResponsesError(
+      return resp.makeResponsesError(
         res,
         'No OTP records found.',
         'UnexpectedError'
       )
-      return
     }
 
     const { expiresAt } = matchedOTPRecord
 
     if (expiresAt < Date.now()) {
       await mOTP.deleteOne({ email })
-      resp.makeResponsesError(
+      return resp.makeResponsesError(
         res,
         'Code has expired. Request for a new one.',
         'UnexpectedError'
       )
-      return
     }
 
     const hashedOTP = matchedOTPRecord.otp
     const validOTP = await verifyHash(otp, hashedOTP)
 
     if (!validOTP) {
-      resp.makeResponsesError(
+      return resp.makeResponsesError(
         res,
         'Invalid code passed. Check your inbox.',
         'UnexpectedError'
       )
-      return
     }
 
     await mOTP.deleteOne({ email })

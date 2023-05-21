@@ -66,7 +66,7 @@ const createUser = async (req, res) => {
       email,
       otp: bcrypt.hashSync(generatedOTP),
       createdAt: Date.now(),
-      expiresAt: Date.now() + 3600000 + 24
+      expiresAt: Date.now() + 3600000 * 24
     })
 
     await mOTP.deleteOne({ email })
@@ -402,6 +402,134 @@ const deleteUser = async (req, res) => {
   }
 }
 
+const passwordReset = async (req, res) => {
+  try {
+
+    const { email } = req.body
+
+    if (!email) {
+      return resp.makeResponsesError(
+        res,
+        'An email is required',
+        'UnexpectedError'
+      )
+    }
+
+    const user = await mUser.findOne({ email, status: 'A' })
+
+    if (!user) {
+      return resp.makeResponsesError(
+        res,
+        `There's no account for the provided email`,
+        'UnexpectedError'
+      )
+    }
+
+    if (!user.verified) {
+      return resp.makeResponsesError(
+        res,
+        `Email hasn't been verified yet. Check your inbox.`,
+        'UnexpectedError'
+      )
+    }
+
+    const generatedOTP = await generateOTP()
+
+    const otp = new mOTP({
+      email,
+      otp: bcrypt.hashSync(generatedOTP),
+      createdAt: Date.now(),
+      expiresAt: Date.now() + 3600000
+    })
+
+    await mOTP.deleteOne({ email })
+    await otp.save()
+
+    const sendedEmail = await sendEmail(
+      email,
+      `Password Reset - BItE brAwL`,
+      OTPTemplate(
+        generatedOTP,
+        1,
+        process.env.EMAIL_USER.toString(),
+        'Enter the code below to reset your password.'
+      )
+    )
+
+    console.log(sendedEmail && 'Email sended')
+
+    resp.makeResponsesOkData(
+      res,
+      otp,
+      'Success'
+    )
+
+  } catch (error) {
+    resp.makeResponsesError(res, error, 'UnexpectedError')
+  }
+}
+
+const passwordRenewed = async (req, res) => {
+  try {
+
+    const { email, otp, newPassword } = req.body
+
+    if (!(email && otp && newPassword)) {
+      return resp.makeResponsesError(
+        res,
+        'Empty credentials are not allowed.',
+        'UnexpectedError'
+      )
+    }
+
+    const matchedOTPRecord = await mOTP.findOne({ email })
+
+    if (!matchedOTPRecord) {
+      return resp.makeResponsesError(
+        res,
+        'No OTP records found.',
+        'UnexpectedError'
+      )
+    }
+
+    const { expiresAt } = matchedOTPRecord
+
+    if (expiresAt < Date.now()) {
+      await mOTP.deleteOne({ email })
+      return resp.makeResponsesError(
+        res,
+        'Code has expired. Request for a new one.',
+        'UnexpectedError'
+      )
+    }
+
+    const hashedOTP = matchedOTPRecord.otp
+    const validOTP = await verifyHash(otp, hashedOTP)
+
+    if (!validOTP) {
+      return resp.makeResponsesError(
+        res,
+        'Invalid code passed. Check your inbox.',
+        'UnexpectedError'
+      )
+    }
+
+    const response = await mUser.findOneAndUpdate(
+      { email }, {
+      $set: {
+        password: bcrypt.hashSync(newPassword)
+      }
+    })
+
+    await mOTP.deleteOne({ email })
+
+    resp.makeResponsesOkData(res, response, 'Success')
+
+  } catch (error) {
+    resp.makeResponsesError(res, error, 'UnexpectedError')
+  }
+}
+
 module.exports = {
   createUser,
   login,
@@ -412,5 +540,7 @@ module.exports = {
   updateUser,
   updateAvatar,
   deleteUser,
-  restorePassword
+  restorePassword,
+  passwordReset,
+  passwordRenewed,
 }
