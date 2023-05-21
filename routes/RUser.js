@@ -9,9 +9,12 @@ router.get('/', cUser.getAllUsers)
 router.get('/:id', cUser.getUser)
 router.put('/', cUser.updateUser)
 router.patch('/avatar', cUser.updateAvatar)
+
 router.patch('/recover', cUser.restorePassword)
+
 router.post('/forget', cUser.passwordReset)
 router.post('/renewed', cUser.passwordRenewed)
+
 router.delete('/', cUser.deleteUser)
 
 module.exports = router
