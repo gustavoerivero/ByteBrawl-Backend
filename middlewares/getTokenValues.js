@@ -4,7 +4,7 @@ require('dotenv').config()
 const getTokenValues = async ({ token }) => {
   try {
 
-    if (token == null) return false
+    if (!token) return false
 
     const decode = await jwt.verify(token, process.env.SECRET_KEY)
     return decode

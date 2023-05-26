@@ -47,7 +47,7 @@ app.get(`${url}/auth`, async (req, res) => {
       return res.send({ Authenticated: false })
     }
 
-    return res.send({ Authenticated: true  })
+    return res.send({ Authenticated: true })
 
   } catch (error) {
     return res.send({ Authenticated: false, error: error })
@@ -57,7 +57,7 @@ app.get(`${url}/auth`, async (req, res) => {
 // Check token
 app.post(`${url}/token`, async (req, res) => {
   try {
-    
+
     const token = await getTokenValues(req.body)
 
     if (!token) {
