@@ -38,9 +38,10 @@ app.get(url, (_, res) =>
 )
 
 // Check user authorized
-app.get(`${url}/auth`, (req, res) => {
+app.get(`${url}/auth`, async (req, res) => {
   try {
-    const auth = authenticateToken(req, res)
+    const auth = await authenticateToken(req, res)
+
     if (!auth?.id) {
       return res.send({ Authenticated: false })
     }
