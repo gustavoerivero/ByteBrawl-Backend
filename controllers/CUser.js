@@ -13,6 +13,7 @@ const sendEmail = require('../services/mailer')
 const template = require('../services/assets/passwordResetTemplate')
 const generateOTP = require('../utils/generateOTP')
 const OTPTemplate = require('../services/assets/OTPTemplate')
+const recoverTemplate = require('../services/assets/recoverTemplate')
 
 require('dotenv').config()
 
@@ -402,6 +403,81 @@ const deleteUser = async (req, res) => {
   }
 }
 
+const sendToken = async (req, res) => {
+  try {
+
+    const { email } = req.body
+
+    if (!email) {
+      return resp.makeResponsesError(
+        res,
+        'An email is required',
+        'UnexpectedError'
+      )
+    }
+
+    const user = await mUser.findOne({ email, status: 'A' })
+
+    if (!user) {
+      return resp.makeResponsesError(
+        res,
+        `There's no account for the provided email`,
+        'UnexpectedError'
+      )
+    }
+
+    if (!user.verified) {
+      return resp.makeResponsesError(
+        res,
+        `Email hasn't been verified yet. Check your inbox.`,
+        'UnexpectedError'
+      )
+    }
+
+    const generatedOTP = await generateOTP()
+
+    const otp = new mOTP({
+      email,
+      otp: bcrypt.hashSync(generatedOTP),
+      createdAt: Date.now(),
+      expiresAt: Date.now() + 3600000
+    })
+
+    await mOTP.deleteOne({ email })
+    await otp.save()
+
+    const secret = process.env.SECRET_KEY
+    const token = jwt.sign(
+      {
+        id: user._id,
+        email: user.email,
+        otp: generatedOTP
+      },
+      secret,
+      { expiresIn: '1h' })
+    const recoverUrl = `${process.env.DEV_URL}${token}`
+
+    const sendedEmail = await sendEmail(
+      email,
+      `Recover your password - BItE brAwL`,
+      recoverTemplate(
+        recoverUrl,
+        'Recover your account access',
+        1,
+        process.env.EMAIL_USER.toString(),
+        'Click on the link to update your password.'
+      )
+    )
+
+    console.log(sendedEmail && 'Email sended')
+
+    return resp.makeResponsesOkData(res, { response: 'Email sended' }, 'Success')
+
+  } catch (error) {
+    return resp.makeResponsesError(res, error, 'UnexpectedError')
+  }
+}
+
 const passwordReset = async (req, res) => {
   try {
 
@@ -523,7 +599,7 @@ const passwordRenewed = async (req, res) => {
 
     await mOTP.deleteOne({ email })
 
-    resp.makeResponsesOkData(res, response, 'Success')
+    return resp.makeResponsesOkData(res, response, 'Success')
 
   } catch (error) {
     resp.makeResponsesError(res, error, 'UnexpectedError')
@@ -543,4 +619,6 @@ module.exports = {
   restorePassword,
   passwordReset,
   passwordRenewed,
+
+  sendToken
 }

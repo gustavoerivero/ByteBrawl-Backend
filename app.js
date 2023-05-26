@@ -12,6 +12,7 @@ require('./db/db')
 // Swagger
 const swaggerUi = require('swagger-ui-express')
 const authenticateToken = require('./middlewares/authenticateToken')
+const getTokenValues = require('./middlewares/getTokenValues')
 
 // Settings
 const port = process.env.PORT || 8000
@@ -50,6 +51,23 @@ app.get(`${url}/auth`, async (req, res) => {
 
   } catch (error) {
     return res.send({ Authenticated: false, error: error })
+  }
+})
+
+// Check token
+app.post(`${url}/token`, async (req, res) => {
+  try {
+    
+    const token = await getTokenValues(req.body)
+
+    if (!token) {
+      return res.send({ token: false })
+    }
+
+    return res.send({ token: true })
+
+  } catch (error) {
+    return res.send({ token: false, error: error })
   }
 })
 

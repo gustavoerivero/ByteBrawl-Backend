@@ -12,6 +12,7 @@ router.patch('/avatar', cUser.updateAvatar)
 
 router.patch('/recover', cUser.restorePassword)
 
+router.post('/restore', cUser.sendToken)
 router.post('/forget', cUser.passwordReset)
 router.post('/renewed', cUser.passwordRenewed)
 
