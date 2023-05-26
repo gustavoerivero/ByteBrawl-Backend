@@ -40,16 +40,15 @@ app.get(url, (_, res) =>
 // Check user authorized
 app.get(`${url}/auth`, (req, res) => {
   try {
-    const auth = Boolean(authenticateToken(req, res))
+    const auth = authenticateToken(req, res)
     if (!auth?.id) {
-      res.send({ Authenticated: false })
-      return
+      return res.send({ Authenticated: false })
     }
 
-    res.send({ Authenticated: true  })
+    return res.send({ Authenticated: true  })
 
   } catch (error) {
-    res.send({ Authenticated: false, error: error })
+    return res.send({ Authenticated: false, error: error })
   }
 })
 
