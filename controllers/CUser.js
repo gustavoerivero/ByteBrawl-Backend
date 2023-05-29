@@ -412,7 +412,7 @@ const sendToken = async (req, res) => {
       return resp.makeResponsesError(
         res,
         'An email is required',
-        'UnexpectedError'
+        'UEmailError'
       )
     }
 
@@ -422,7 +422,7 @@ const sendToken = async (req, res) => {
       return resp.makeResponsesError(
         res,
         `There's no account for the provided email`,
-        'UnexpectedError'
+        'URestoreError'
       )
     }
 
@@ -430,7 +430,7 @@ const sendToken = async (req, res) => {
       return resp.makeResponsesError(
         res,
         `Email hasn't been verified yet. Check your inbox.`,
-        'UnexpectedError'
+        'UVerifiedError'
       )
     }
 
@@ -487,7 +487,7 @@ const passwordReset = async (req, res) => {
       return resp.makeResponsesError(
         res,
         'An email is required',
-        'UnexpectedError'
+        'UEmailError'
       )
     }
 
@@ -497,7 +497,7 @@ const passwordReset = async (req, res) => {
       return resp.makeResponsesError(
         res,
         `There's no account for the provided email`,
-        'UnexpectedError'
+        'URestoreError'
       )
     }
 
@@ -505,7 +505,7 @@ const passwordReset = async (req, res) => {
       return resp.makeResponsesError(
         res,
         `Email hasn't been verified yet. Check your inbox.`,
-        'UnexpectedError'
+        'UVerifiedError'
       )
     }
 
@@ -554,7 +554,7 @@ const passwordRenewed = async (req, res) => {
       return resp.makeResponsesError(
         res,
         'Empty credentials are not allowed.',
-        'UnexpectedError'
+        'UEmpty'
       )
     }
 
@@ -564,7 +564,7 @@ const passwordRenewed = async (req, res) => {
       return resp.makeResponsesError(
         res,
         'No OTP records found.',
-        'UnexpectedError'
+        'OTPNoMatch'
       )
     }
 
@@ -575,7 +575,7 @@ const passwordRenewed = async (req, res) => {
       return resp.makeResponsesError(
         res,
         'Code has expired. Request for a new one.',
-        'UnexpectedError'
+        'OTPExpires'
       )
     }
 
@@ -586,7 +586,7 @@ const passwordRenewed = async (req, res) => {
       return resp.makeResponsesError(
         res,
         'Invalid code passed. Check your inbox.',
-        'UnexpectedError'
+        'OTPInvalid'
       )
     }
 

@@ -16,6 +16,13 @@
   "UChangePasswordError": "Error, incorrect password",
   "UChangePasswordError1": "Error, the old password and new password are the same",
   "UChangePasswordSuccess": "User password changed",
+  "UEmpty": "Empty credentials are not allowed",
+  "UEmailError": "An email is required",
+  "URestoreError": "There's no account for the provided email",
+  "UVerifiedError": "Account hasn't been verified yet. Check your inbox",
+  "OTPNoMatch": "No OTP match record",
+  "OTPExpires": "Code has expired. Request for a new one",
+  "OTPInvalid": "Invalid code.",
   "MCreated": "Message created",
   "Unauthorized": "Unauthorized user",
   "Forbidden": "Request rejected. Forbidden"
